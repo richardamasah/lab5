@@ -1,0 +1,30 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, to_timestamp
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+# ✅ Initialize SparkSession with Delta Lake support
+spark = SparkSession.builder \
+    .appName("CleanOrderItemsETL") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+    .getOrCreate()
+
+# ✅ Define schema
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("order_id", IntegerType(), True),
+    StructField("user_id", IntegerType(), True),
+    StructField("days_since_prior_order", IntegerType(), True),
+    StructField("product_id", IntegerType(), True),
+    StructField("add_to_cart_order", IntegerType(), True),
+    StructField("reordered", IntegerType(), True),
+    StructField("order_timestamp", StringType(), True),
+    StructField("date", StringType(), True)
+])
+
+# ✅ Read from S3
+raw_path = "s3://lab5lakehouse/lakehouse/raw/order_items/order_items.csv"
+df = spark.read.format("csv").option("header", "true").schema(schema).load(raw_path)
+
+# ✅ Drop null critical fields
+valid_df_
