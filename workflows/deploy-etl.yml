@@ -2,7 +2,7 @@ name: Upload ETL Scripts to S3
 
 on:
   push:
-    branches: [ main ]  # Only run when you push to main
+    branches: [ lab5 ]  # Only run when you push to main
 
 jobs:
   upload-scripts:
