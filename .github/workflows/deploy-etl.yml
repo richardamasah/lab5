@@ -1,11 +1,11 @@
-name: Upload ETL Scripts to S3
+name: Upload ETL Scripts to S3 and Deploy Step Function
 
 on:
   push:
     branches: [ lab5 ]
 
 jobs:
-  upload-scripts:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,3 +22,9 @@ jobs:
     - name: Upload all ETL scripts to S3
       run: |
         aws s3 cp etl_scripts/ s3://lab5lakehouse/scripts/ --recursive --exclude "*" --include "*.py"
+
+    - name: Deploy Step Function definition
+      run: |
+        aws stepfunctions update-state-machine \
+          --state-machine-arn arn:aws:states:eu-north-1:992382846559:stateMachine:lakehouse-pipeline-stepfxn \
+          --definition file://state_machine/lakehouse-pipeline.json
