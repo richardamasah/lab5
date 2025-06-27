@@ -1,0 +1,70 @@
+{
+  "Comment": "Lakehouse Orchestration - CI/CD Deployed",
+  "StartAt": "Run Glue Jobs",
+  "States": {
+    "Run Glue Jobs": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "Clean Products",
+          "States": {
+            "Clean Products": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "clean-products-job"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Clean Orders",
+          "States": {
+            "Clean Orders": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "clean-orders-job"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Clean Order Items",
+          "States": {
+            "Clean Order Items": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "clean-order-items-job"
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "Run Glue Crawler"
+    },
+    "Run Glue Crawler": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Parameters": {
+        "Name": "lakehouse-dwh-crawler"
+      },
+      "Next": "Run Athena Query"
+    },
+    "Run Athena Query": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:lakehouseAthenaQuery",
+      "Parameters": {
+        "FunctionName": "lakehouseAthenaQuery",
+        "Payload": {
+          "query": "SELECT COUNT(*) FROM products"
+        }
+      },
+      "End": true
+    }
+  }
+}
