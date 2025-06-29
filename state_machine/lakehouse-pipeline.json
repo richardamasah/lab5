@@ -17,7 +17,6 @@
         }
       ]
     },
-
     "Run Glue Jobs": {
       "Type": "Parallel",
       "Branches": [
@@ -30,13 +29,7 @@
               "Parameters": {
                 "JobName": "clean-products-job"
               },
-              "End": true,
-              "Catch": [
-                {
-                  "ErrorEquals": ["States.ALL"],
-                  "Next": "Fail State"
-                }
-              ]
+              "End": true
             }
           }
         },
@@ -49,13 +42,7 @@
               "Parameters": {
                 "JobName": "clean-orders-job"
               },
-              "End": true,
-              "Catch": [
-                {
-                  "ErrorEquals": ["States.ALL"],
-                  "Next": "Fail State"
-                }
-              ]
+              "End": true
             }
           }
         },
@@ -68,20 +55,19 @@
               "Parameters": {
                 "JobName": "clean-order-items-job"
               },
-              "End": true,
-              "Catch": [
-                {
-                  "ErrorEquals": ["States.ALL"],
-                  "Next": "Fail State"
-                }
-              ]
+              "End": true
             }
           }
         }
       ],
-      "Next": "Run Glue Crawler"
+      "Next": "Run Glue Crawler",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Fail State"
+        }
+      ]
     },
-
     "Run Glue Crawler": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
@@ -96,7 +82,6 @@
         }
       ]
     },
-
     "Run Athena Query": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:lakehouseAthenaQuery",
@@ -114,7 +99,6 @@
         }
       ]
     },
-
     "Archive Raw File": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:archiveRawFile",
@@ -130,7 +114,6 @@
         }
       ]
     },
-
     "Fail State": {
       "Type": "Fail",
       "Error": "StepFunctionFailed",
