@@ -104,7 +104,7 @@
       "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:archiveRawFile",
       "Parameters": {
         "FunctionName": "archiveRawFile",
-        "Payload.$": "$"
+        "Payload.$": "$$.Execution.Input"
       },
       "End": true,
       "Catch": [
