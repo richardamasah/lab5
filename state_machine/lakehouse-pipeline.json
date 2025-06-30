@@ -1,22 +1,7 @@
 {
-  "Comment": "Lakehouse Orchestration - With Validation, Error Handling, and Archiving",
-  "StartAt": "Validate File (Inside StepFn)",
+  "Comment": "Lakehouse Orchestration - Improved with Wait Logic and Cleaned",
+  "StartAt": "Run Glue Jobs",
   "States": {
-    "Validate File (Inside StepFn)": {
-      "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:validateFileBeforeETL",
-      "Parameters": {
-        "FunctionName": "validateFileBeforeETL",
-        "Payload.$": "$"
-      },
-      "Next": "Run Glue Jobs",
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Fail State"
-        }
-      ]
-    },
     "Run Glue Jobs": {
       "Type": "Parallel",
       "Branches": [
@@ -60,7 +45,7 @@
           }
         }
       ],
-      "Next": "Run Glue Crawler",
+      "Next": "Wait Before Crawler",
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
@@ -68,6 +53,13 @@
         }
       ]
     },
+
+    "Wait Before Crawler": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "Run Glue Crawler"
+    },
+
     "Run Glue Crawler": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
@@ -82,6 +74,7 @@
         }
       ]
     },
+
     "Run Athena Query": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:lakehouseAthenaQuery",
@@ -99,6 +92,7 @@
         }
       ]
     },
+
     "Archive Raw File": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:eu-north-1:992382846559:function:archiveRawFile",
@@ -114,10 +108,11 @@
         }
       ]
     },
+
     "Fail State": {
       "Type": "Fail",
       "Error": "StepFunctionFailed",
-      "Cause": "Pipeline failed during validation or processing"
+      "Cause": "Pipeline failed during a processing step"
     }
   }
 }
