@@ -2,8 +2,7 @@ name: Deploy Step Function
 
 on:
   push:
-    paths:
-      - "state_machine/lakehouse-pipeline.json"
+    
     branches: [ lab5 ]
 
 jobs:
