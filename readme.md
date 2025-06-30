@@ -4,7 +4,7 @@
 
 ##  Overview
 
-This project implements a complete end-to-end data pipeline using a Lakehouse architecture on AWS. It ingests raw order data, cleans it using PySpark on AWS Glue, stores the processed data in Delta Lake format, runs a crawler to update metadata, executes queries via Athena, and archives raw files — all orchestrated with AWS Step Functions and triggered automatically using Lambda.
+This project implements a complete end-to-end data pipeline using a Lakehouse architecture on AWS. It ingests raw order data, cleans it using PySpark on AWS Glue, stores the processed data in Delta Lake format, runs a crawler to update metadata, executes queries via Athena, and archives raw files — all orchestrated with AWS Step Functions and triggered automatically using Lambda. 
 
 This pipeline is designed to scale, handle daily file drops, and ensure data quality through validation and structured processing.
 
@@ -250,5 +250,6 @@ You can rebuild this project end-to-end by following these steps:
 
 
 
-#   u p d a t e   s t e p f n  
+#   u p d a t e   s t e p f n 
+ 
  
