@@ -1,30 +1,27 @@
-name: Upload ETL Scripts to S3 and Deploy Step Function
+name: Run ETL Unit Tests
 
 on:
   push:
     branches: [ lab5 ]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Upload all ETL scripts to S3
-      run: |
-        aws s3 cp etl_scripts/ s3://lab5lakehouse/scripts/ --recursive --exclude "*" --include "*.py"
+      - name: Install dependencies
+        run: pip install pytest
 
-    - name: Deploy Step Function definition
-      run: |
-        aws stepfunctions update-state-machine \
-          --state-machine-arn arn:aws:states:eu-north-1:992382846559:stateMachine:lakehouse-pipeline-stepfxn \
-          --definition file://state_machine/lakehouse-pipeline.json
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+      - name: Run Pytest
+        run: pytest tests/ -v
