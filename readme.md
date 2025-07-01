@@ -8,6 +8,8 @@ This project implements a complete end-to-end data pipeline using a Lakehouse ar
 
 This pipeline is designed to scale, handle daily file drops, and ensure data quality through validation and structured processing.
 
+![Architecture Diagram](images/lab5.png)
+
 ---
 
 ##  Problem Statement
