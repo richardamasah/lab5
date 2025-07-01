@@ -1,27 +1,62 @@
+Here's your GitHub Actions workflow with comprehensive comments, explaining each part for clarity and understanding:
+
+# Workflow Name: Run ETL Unit Tests
+# This is the name that will appear in the GitHub Actions UI for this workflow.
 name: Run ETL Unit Tests
 
+# Event Trigger: When to run this workflow.
+# This workflow is configured to run automatically on specific Git events.
 on:
   push:
+    # Branches: Specifies on which branches the 'push' event will trigger the workflow.
+    # In this case, the workflow will only run when changes are pushed to the 'lab5' branch.
     branches: [ lab5 ]
 
+# Jobs: Defines the set of jobs that will be executed as part of this workflow.
+# A workflow can have one or more jobs, which run in parallel by default.
 jobs:
+  # Job Name: 'test'
+  # This job is responsible for setting up the environment and running the unit tests.
   test:
+    # Runner Environment: Specifies the type of machine the job will run on.
+    # 'ubuntu-latest' means the job will execute on the latest available Ubuntu Linux runner.
     runs-on: ubuntu-latest
 
+    # Steps: A sequence of tasks that will be executed within this job.
+    # Each step can be a shell command, an action, or a composite run step.
     steps:
+      # Step 1: Checkout code
+      # This action checks out your repository code onto the runner machine.
+      # It's essential for accessing your project files (including ETL scripts and tests).
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python
+      # This action sets up a specific version of Python on the runner.
+      # It ensures that the correct Python environment is available for your PySpark scripts and tests.
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
+          # Specifies the Python version to use. '3.9' is selected here.
           python-version: '3.9'
 
+      # Step 3: Install dependencies
+      # This step runs a shell command to install necessary Python packages.
+      # 'pytest' is installed, which is the testing framework used for your unit tests.
       - name: Install dependencies
         run: pip install pytest
 
+      # Step 4: Set PYTHONPATH
+      # This step configures the PYTHONPATH environment variable.
+      # It tells Python where to look for modules and packages.
+      # By adding $GITHUB_WORKSPACE (the root of your checked-out repository),
+      # your PySpark ETL scripts and test files can be imported correctly.
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
+      # Step 5: Run Pytest
+      # This is the core step that executes your unit tests using Pytest.
+      # 'pytest tests/' tells Pytest to discover and run tests located in the 'tests/' directory.
+      # '-v' (verbose) provides more detailed output during test execution.
       - name: Run Pytest
         run: pytest tests/ -v
