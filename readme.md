@@ -137,6 +137,8 @@ Invalid rows are written to a rejected folder, while clean Delta-formatted data 
 
 ##  Step Function Breakdown
 
+![Step function](images/stepfunctions_graph.png)
+
 The Step Function orchestrates the full pipeline. Once a valid file lands in the S3 raw zone, Lambda triggers the execution. Here's what happens inside:
 
 ###  Full Flow:
