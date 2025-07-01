@@ -226,6 +226,111 @@ You can rebuild this project end-to-end by following these steps:
 
 ---
 
+
+---
+
+##  1.  User Guide (Setup & Usage Instructions)
+
+You can place this **after "How to Reproduce the Work"** in your README.
+
+
+##  User Guide: How to Run and Use This Pipeline
+
+###  Step 1: Upload New Data to S3
+
+Drop your raw CSV files into the correct S3 folders:
+```
+
+s3://lab5lakehouse/lakehouse/raw/products/products\_YYYY-MM-DD.csv
+s3://lab5lakehouse/lakehouse/raw/orders/orders\_YYYY-MM-DD.csv
+s3://lab5lakehouse/lakehouse/raw/order\_items/order\_items\_YYYY-MM-DD.csv
+
+```
+
+File names must include the year (e.g., `2025`) to pass validation.
+
+---
+
+###  Step 2: Trigger the Pipeline Automatically
+
+Once a valid file is uploaded:
+- An AWS Lambda function checks the filename and structure
+- If valid, it triggers the AWS Step Function pipeline
+- If invalid, the file is skipped or moved to a rejected zone
+
+---
+
+###  Step 3: Pipeline Execution
+
+The pipeline:
+1. Runs Glue ETL jobs to clean and deduplicate the data
+2. Partitions and stores the data in Delta Lake format under `lakehouse-dwh`
+3. Updates the Glue Data Catalog with a crawler
+4. Runs an Athena query automatically
+5. Archives the raw file to the `archive/` folder
+
+---
+
+###  Step 4: Query Clean Data via Athena
+
+Go to **Amazon Athena → Query Editor** and run SQL queries on the `lakehouse_dwh` database.
+
+---
+
+###  Step 5: Monitor Pipeline
+
+You can monitor:
+- Lambda → CloudWatch Logs
+- Step Function executions → AWS Step Functions Console
+- Glue Job status → AWS Glue → ETL Jobs
+- Athena query results → Athena history panel
+
+---
+
+
+
+##  Athena Queries
+
+
+
+##  Sample Athena Queries
+
+Here are a few useful SQL queries to gain insights from the cleaned Lakehouse tables:
+
+###  Top 5 Selling Products
+```sql
+SELECT p.product_name, COUNT(*) AS total_sales
+FROM lakehouse_dwh.order_items oi
+JOIN lakehouse_dwh.products p ON oi.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sales DESC
+LIMIT 5;
+````
+
+---
+
+###  Total Revenue Per Day
+
+```sql
+SELECT date, ROUND(SUM(total_amount), 2) AS revenue
+FROM lakehouse_dwh.orders
+GROUP BY date
+ORDER BY date;
+```
+
+---
+
+###  Reorder Frequency
+
+```sql
+SELECT reordered, COUNT(*) AS count
+FROM lakehouse_dwh.order_items
+GROUP BY reordered;
+```
+
+
+
+
 ##  Challenges Faced
 
 *  Spark cannot run on local Windows → PySpark tests were skipped
